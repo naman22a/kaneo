@@ -1,0 +1,36 @@
+name: CI CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'assets/**/*.*'
+
+jobs:
+    # CI
+    lint:
+        uses: ./.github/workflows/lint.yml
+
+    secrets-scan:
+        uses: ./.github/workflows/secrets-scan.yml
+        secrets: inherit
+
+    audit:
+        uses: ./.github/workflows/audit.yml
+
+    docker-scan:
+        uses: ./.github/workflows/docker-lint.yml
+
+    docker-build-test-and-push:
+      needs: [code-quality, secrets-scan, dependency-scan, docker-scan]
+      uses: ./.github/workflows/docker-build-and-push.yml
+      secrets: inherit
+
+    # CD
+    # deploy:
+    #   needs: [docker-build-test-and-push]
+    #   uses: ./.github/workflows/deploy.yml
+    #   secrets: inherit

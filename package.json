@@ -43,7 +43,7 @@
       "markdown-it": "14.1.1",
       "minimatch": "10.2.3",
       "rollup": "4.59.0",
-      "seroval": "1.4.1",
+      "seroval": "^1.5.3",
       "effect": ">=3.20.0",
       "fast-xml-parser": ">=5.5.7",
       "socket.io-parser": ">=4.2.6",
