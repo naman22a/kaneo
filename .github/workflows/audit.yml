@@ -1,10 +1,10 @@
-name: Dependency Scan
+name: Audit
 
 on:
     workflow_call:
 
 jobs:
-    dependency-check:
+    audit:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
