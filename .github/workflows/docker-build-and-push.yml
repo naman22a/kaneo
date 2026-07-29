@@ -23,5 +23,3 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/kaneo:latest,${{ secrets.DOCKER_USERNAME }}/kaneo:${{ github.sha }}
         platforms: linux/amd64
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
