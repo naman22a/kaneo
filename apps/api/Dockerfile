@@ -81,7 +81,7 @@ COPY --from=builder --chown=appuser:appuser /app/packages/email ./packages/email
 COPY --from=builder --chown=appuser:appuser /app/packages/permissions ./packages/permissions
 
 # Fail the build early if the runtime dependency layout is broken on the target architecture
-RUN cd /app/apps/api && node -e "const fs=require('fs');for(const m of ['bcryptjs','hono','pg','drizzle-orm','better-auth','ioredis','valibot','octokit','@modelcontextprotocol/sdk']){fs.accessSync('node_modules/'+m+'/package.json')}"
+RUN node -e "const fs=require('fs');process.chdir('/app/apps/api');for(const m of ['bcryptjs','hono','pg','drizzle-orm','better-auth','ioredis','valibot','octokit','@modelcontextprotocol/sdk']){fs.accessSync('node_modules/'+m+'/package.json')}"
 
 # Switch to non-root user
 USER appuser
