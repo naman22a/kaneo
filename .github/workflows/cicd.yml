@@ -24,13 +24,13 @@ jobs:
     docker-scan:
         uses: ./.github/workflows/docker-lint.yml
 
-    docker-build-test-and-push:
+    docker-build-and-push:
       needs: [lint, secrets-scan, audit, docker-scan]
       uses: ./.github/workflows/docker-build-and-push.yml
       secrets: inherit
 
     # CD
-    # deploy:
-    #   needs: [docker-build-test-and-push]
-    #   uses: ./.github/workflows/deploy.yml
-    #   secrets: inherit
+    deploy:
+      needs: [docker-build-and-push]
+      uses: ./.github/workflows/deploy.yml
+      secrets: inherit
