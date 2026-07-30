@@ -49,7 +49,8 @@ resource "aws_security_group" "my_security_group" {
 # EC2 Instance
 
 resource "aws_instance" "my_instance" {
-  count = var.ec2_instance_count
+  for_each = var.instances
+
   ami           = var.ec2_ami_id
   instance_type = var.ec2_instance_type
 
@@ -69,7 +70,7 @@ resource "aws_instance" "my_instance" {
 }
 
 resource "aws_ec2_instance_state" "my_instance_state" {
-  count = var.ec2_instance_count
-  instance_id = aws_instance.my_instance[count.index].id
+  for_each = aws_instance.my_instance
+  instance_id = each.value.id
   state = var.ec2_instance_state
 }

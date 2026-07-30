@@ -37,3 +37,11 @@ variable "ec2_instance_count" {
   description = "This variable holds EC2 instance count"
   type = number
 }
+
+variable "instances" {
+    type = map(object({
+      ami = string
+      user = string
+      os_family = string
+    }))
+}

@@ -62,3 +62,7 @@ compose.override.yml
 .terraformrc
 terraform.rc
 *tfplan*
+
+# ansible inventory file
+infra/ansible/prd
+infra/ansible/stg
