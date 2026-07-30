@@ -22,6 +22,7 @@
           - git
           - docker.io
           - docker-compose-v2
+          - nginx
         state: present
 
     - name: Enable Docker
@@ -60,9 +61,9 @@
         project_src: "{{ app_dir }}"
         state: present
 
-    - name: Install Nginx configuration
+    - name: Install Nginx configuration (HTTP)
       ansible.builtin.template:
-        src: "{{ playbook_dir }}/../templates/nginx.conf.j2"
+        src: "{{ playbook_dir }}/../templates/nginx-http.conf.j2"
         dest: /etc/nginx/sites-available/kaneo
         mode: "0644"
 
@@ -77,11 +78,15 @@
         path: /etc/nginx/sites-enabled/default
         state: absent
 
-    - name: Reload Nginx
+    - name: Validate nginx configuration
+      ansible.builtin.command: nginx -t
+      changed_when: false
+
+    - name: Start nginx
       ansible.builtin.systemd:
         name: nginx
-        state: reloaded
-
+        enabled: true
+        state: restarted
 
     - name: Install Certbot
       ansible.builtin.apt:
@@ -89,11 +94,6 @@
           - certbot
           - python3-certbot-nginx
         state: present
-    
-    - name: Check certbot
-      ansible.builtin.command: which certbot
-      register: certbot_check
-      changed_when: false
 
     - name: Obtain Let's Encrypt certificate
       ansible.builtin.command:
@@ -106,4 +106,18 @@
           -d {{ domain }}
       args:
         creates: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
-      when: certbot_check.rc == 0
+
+    - name: Install Nginx configuration (HTTPS)
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../templates/nginx-https.conf.j2"
+        dest: /etc/nginx/sites-available/kaneo
+        mode: "0644"
+
+    - name: Validate nginx configuration
+      ansible.builtin.command: nginx -t
+      changed_when: false
+
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded

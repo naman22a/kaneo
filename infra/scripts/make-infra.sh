@@ -41,8 +41,6 @@ PLAYBOOK="$ANSIBLE_DIR/playbooks/site.yml"
 }
 
 echo "==> Running Ansible"
-echo "$INVENTORY"
-echo "$PLAYBOOK"
 
 ansible-playbook \
     -i "$INVENTORY" \
