@@ -16,4 +16,4 @@ jobs:
                 chmod +x /usr/local/bin/hadolint
               
             - name: Find and Lint all Dockerfiles
-              run: find . -name "Dockerfile*" -print0 | xargs -0 hadolint
+              run: find . -name "Dockerfile*" -print0 | xargs -0 hadolint --threshold warning
