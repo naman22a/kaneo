@@ -1,0 +1,109 @@
+---
+- name: Bootstrap Kaneo server
+  hosts: servers
+  become: true
+
+  vars:
+    app_dir: /opt/kaneo
+    domain: kaneo.namanarora.xyz
+    email: namanarora1022@gmail.com
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+          - docker.io
+          - docker-compose-v2
+        state: present
+
+    - name: Enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy compose.yml
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../../compose.yml"
+        dest: /opt/kaneo/compose.yml
+        mode: "0644"
+
+    - name: Copy environment file
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../../.env"
+        dest: /opt/kaneo/.env
+        mode: "0600"
+
+    - name: Pull Docker images
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        pull: always
+
+    - name: Start application
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+
+    - name: Install Nginx configuration
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../templates/nginx.conf.j2"
+        dest: /etc/nginx/sites-available/kaneo
+        mode: "0644"
+
+    - name: Enable site
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/kaneo
+        dest: /etc/nginx/sites-enabled/kaneo
+        state: link
+
+    - name: Remove default site
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Reload Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+
+    - name: Install Certbot
+      ansible.builtin.apt:
+        name:
+          - certbot
+          - python3-certbot-nginx
+        state: present
+    
+    - name: Check certbot
+      ansible.builtin.command: which certbot
+      register: certbot_check
+      changed_when: false
+
+    - name: Obtain Let's Encrypt certificate
+      ansible.builtin.command:
+        cmd: >
+          certbot --nginx
+          --non-interactive
+          --agree-tos
+          --redirect
+          --email {{ email }}
+          -d {{ domain }}
+      args:
+        creates: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+      when: certbot_check.rc == 0

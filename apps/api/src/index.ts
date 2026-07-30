@@ -169,6 +169,7 @@ export function createApp() {
   const corsOriginSource = [
     process.env.CORS_ORIGINS,
     process.env.KANEO_CLIENT_URL,
+    'https://kaneo.namanarora.xyz',
   ].find((value) => value?.trim());
   const corsOrigins = corsOriginSource
     ?.split(",")
