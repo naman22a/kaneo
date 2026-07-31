@@ -1,0 +1,36 @@
+name: Staging CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["staging"]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'assets/**/*.*'
+
+jobs:
+  # CI
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  secrets-scan:
+    uses: ./.github/workflows/secrets-scan.yml
+    secrets: inherit
+
+  audit:
+    uses: ./.github/workflows/audit.yml
+
+  docker-scan:
+    uses: ./.github/workflows/docker-lint.yml
+
+  docker-build-and-push:
+    needs: [lint, secrets-scan, audit, docker-scan]
+    uses: ./.github/workflows/docker-build-and-push.yml
+    secrets: inherit
+
+  # CD
+  deploy:
+    needs: docker-build-and-push
+    uses: ./.github/workflows/deploy-staging.yml
+    secrets: inherit

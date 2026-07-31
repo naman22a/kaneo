@@ -42,8 +42,20 @@ PLAYBOOK="$ANSIBLE_DIR/playbooks/site.yml"
 
 echo "==> Running Ansible"
 
+ENV=$(terraform -chdir="$TF_DIR" workspace show)
+
+if [ "$ENV" = "stg" ]; then
+  DOMAIN=staging-kaneo.namanarora.xyz
+  ENV_FILE=.env.staging
+else
+  DOMAIN=kaneo.namanarora.xyz
+  ENV_FILE=.env.production
+fi
+
 ansible-playbook \
     -i "$INVENTORY" \
-    "$PLAYBOOK"
+    "$PLAYBOOK" \
+    -e "domain=$DOMAIN" \
+    -e "env_file=$ENV_FILE"
 
 echo "==> Deployment complete"

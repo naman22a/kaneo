@@ -7,6 +7,7 @@
     app_dir: /opt/kaneo
     domain: kaneo.namanarora.xyz
     email: namanarora1022@gmail.com
+    env_file: .env
 
   tasks:
     - name: Update apt cache
@@ -47,7 +48,7 @@
 
     - name: Copy environment file
       ansible.builtin.copy:
-        src: "{{ playbook_dir }}/../../../.env"
+        src: "{{ playbook_dir }}/../../../{{ env_file }}"
         dest: /opt/kaneo/.env
         mode: "0600"
 
