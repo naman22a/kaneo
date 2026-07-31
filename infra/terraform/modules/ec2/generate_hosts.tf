@@ -9,6 +9,6 @@ resource "local_file" "my_hosts_file" {
     private_key = "/home/naman/.ssh/id_rsa"
   })
 
-  filename        = abspath("${path.module}/../../../ansible/${var.env}/hosts")
+  filename        = abspath("${path.module}/../../../ansible/inventory/${var.env}/hosts")
   file_permission = "0644"
 }

@@ -64,5 +64,5 @@ terraform.rc
 *tfplan*
 
 # ansible inventory file
-infra/ansible/prd
-infra/ansible/stg
+infra/ansible/inventory/prd
+infra/ansible/inventory/stg

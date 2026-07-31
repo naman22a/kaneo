@@ -27,7 +27,7 @@ echo "==> Applying Terraform"
 
 terraform -chdir="$TF_DIR" apply -auto-approve
 
-INVENTORY="$ANSIBLE_DIR/$WORKSPACE/hosts"
+INVENTORY="$ANSIBLE_DIR/inventory/$WORKSPACE/hosts"
 PLAYBOOK="$ANSIBLE_DIR/playbooks/site.yml"
 
 [[ -f "$INVENTORY" ]] || {
